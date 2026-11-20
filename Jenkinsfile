@@ -34,5 +34,19 @@ pipeline {
                 echo 'Deploy completado: la aplicación se ejecuta en segundo plano'
             }
         }
+
+        stage('OWASP ZAP') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh '''
+                        docker run --rm --network container:jenkins \
+                          -v jenkins_home:/zap/wrk \
+                          zaproxy/zap-stable zap-baseline.py \
+                          -t "http://localhost:5000/hello?name=Diego" \
+                          -r zap_report.html
+                    '''
+                }
+            }
+        }
     }
 }
