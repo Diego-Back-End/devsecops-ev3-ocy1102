@@ -48,7 +48,8 @@ pipeline {
                           -v jenkins_home:/zap/wrk \
                           zaproxy/zap-stable zap-baseline.py \
                           -t "http://localhost:5000/hello?name=Diego" \
-                          -r zap_report.html
+                          -r zap_report.html \
+                          -I
                     '''
                 }
             }
