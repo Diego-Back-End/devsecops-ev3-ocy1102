@@ -4,21 +4,26 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'pip install -r requirements.txt'
+                sh '''
+                    if [ ! -d venv ]; then
+                        python3 -m venv venv
+                    fi
+                    venv/bin/pip install -r requirements.txt
+                '''
             }
         }
 
         stage('Test') {
             steps {
-                sh 'python -m unittest test_app.py'
+                sh 'venv/bin/python -m unittest test_app.py'
             }
         }
 
         stage('Security Scan') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh 'pip install bandit'
-                    sh 'bandit -r app.py -f txt'
+                    sh 'venv/bin/pip install bandit'
+                    sh 'venv/bin/bandit -r app.py -f txt'
                 }
             }
         }
