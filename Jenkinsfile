@@ -30,7 +30,12 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh 'nohup python app.py > app.log 2>&1 &'
+                sh '''
+                    pkill -f "flask run" || true
+                    JENKINS_NODE_COOKIE=dontKillMe FLASK_APP=app FLASK_RUN_HOST=0.0.0.0 nohup venv/bin/flask run --port 5000 > app.log 2>&1 &
+                    sleep 3
+                    curl -fsS "http://localhost:5000/hello?name=Diego"
+                '''
                 echo 'Deploy completado: la aplicación se ejecuta en segundo plano'
             }
         }
